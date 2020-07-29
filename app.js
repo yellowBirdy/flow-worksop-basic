@@ -5,6 +5,8 @@ import * as types from "@onflow/types";
 
 import fungibleTokenContract from "./cadence/FungibleToken.cdc";
 import empty from "./cadence/EmptyContract.cdc";
+import { mint, getBalance } from "./flow";
+
 
 fcl.config()
   .put("challenge.handshake", "http://localhost:8701/flow/authenticate")
@@ -13,7 +15,7 @@ const simpleComputation = async () => {
     const script = sdk.script`
         pub fun main():Int{
             return 2 + 2
-        }
+        }x$
     `;
     const response = await fcl.send([script]);
     console.log({response});
@@ -273,8 +275,8 @@ document.getElementById("login").addEventListener('click', ()=>{
     unsubcsribe = fcl.currentUser().subscribe((user)=>{
         console.log({user});
     })
-
-    fcl.authenticate();
+    console.log(fcl.currentUser())
+    //fcl.authenticate();
 })
 
 document.getElementById('deploy').addEventListener('click', async ()=>{
@@ -285,6 +287,18 @@ document.getElementById('deploy').addEventListener('click', async ()=>{
 document.getElementById('init').addEventListener('click', async ()=>{
   const response = await initMainVault();
   console.log({response});
+})
+
+document.getElementById('mint').addEventListener('click', async () => {
+  const amount = parseInt(document.getElementById('amount').value)
+  const response = await mint(amount)
+  console.log(fcl.decode(response))
+  
+  const balanceRes = await getBalance()
+  console.log(balanceRes)
+  console.log(fcl.decode(balanceRes))
+
+  document.getElementById('balance').innerHTML = await fcl.decode(balanceRes)
 })
 // simpleComputation();
 

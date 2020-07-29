@@ -5,6 +5,7 @@ pub contract HelloWorld {
     // All fields must be initialized in the init() function.
     pub let greeting: String
 
+
     // The init() function is required if the contract contains any fields.
     init() {
         self.greeting = "Hello, World!"
