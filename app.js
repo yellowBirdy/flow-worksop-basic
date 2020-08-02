@@ -4,30 +4,14 @@ import * as sdk from "@onflow/sdk";
 import * as types from "@onflow/types";
 
 import fungibleTokenContract from "./cadence/FungibleToken.cdc";
+import initTransaction from "./cadence/transactions/init.cdc";
+
 import { mint, getBalance } from "./flow";
-import { deployContract } from "/utils";
+import { deployContract, generateCode } from "/utils";
 
 
 fcl.config()
   .put("challenge.handshake", "http://localhost:8701/flow/authenticate")
-
-const simpleComputation = async () => { 
-    const script = sdk.script`
-        pub fun main():Int{
-            return 2 + 2
-        }x$
-    `;
-    const response = await fcl.send([script]);
-    console.log({response});
-    const result = await fcl.decode(response);
-    console.log('Result', result);
-}
-
-const readBalance = async () =>{
-  const codeFile = await fetch(fungibleTokenContract);
-  const code = await codeFile.text();
-}
-
 
 
 const initMainVault = async () => {
@@ -35,9 +19,9 @@ const initMainVault = async () => {
   const accountAddress = `0x${user.addr}`
   const contractAddress = accountAddress;
 
-  console.log({accountAddress, contractAddress});
-
+/*
   const transaction = sdk.transaction`
+
     // Transaction1.cdc
 
     import FungibleToken from ${p => p.contractAddress}
@@ -59,22 +43,22 @@ const initMainVault = async () => {
         }
     }
   `
+  */
+
+
+  const transaction = sdk.transaction`${await generateCode(initTransaction, {
+    query: /(0x01)/g,
+    "0x01": contractAddress
+  })}`
   const { authorization } = fcl.currentUser();
 
   return await fcl.send([
     transaction,
-    fcl.params([
-      fcl.param(accountAddress, types.Identity, "accountAddress"),
-      fcl.param(contractAddress, types.Identity, "contractAddress")
-    ]),
     fcl.payer(authorization),
     fcl.proposer(authorization),
     fcl.authorizations([authorization]),
     fcl.limit(100)
-  ], {
-    node: "http://localhost:8080",
-  })
-
+  ])
 }
 
 
