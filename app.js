@@ -4,8 +4,8 @@ import * as sdk from "@onflow/sdk";
 import * as types from "@onflow/types";
 
 import fungibleTokenContract from "./cadence/FungibleToken.cdc";
-import empty from "./cadence/EmptyContract.cdc";
 import { mint, getBalance } from "./flow";
+import { deployContract } from "/utils";
 
 
 fcl.config()
@@ -28,32 +28,6 @@ const readBalance = async () =>{
   const code = await codeFile.text();
 }
 
-const deployContract = async (url) => {
-
-  const code = await (await fetch(url)).text()
-
-  const user = fcl.currentUser();
-  const { authorization } = user;
-
-  return fcl.send(
-    [
-      sdk.transaction`
-          transaction {
-            prepare(acct: AuthAccount) {
-              acct.setCode("${(p) => p.code}".decodeHex())
-            }
-          }
-        `,
-      fcl.params([
-        fcl.param(Buffer.from(code, "utf8").toString("hex"), types.Identity, "code"),
-      ]),
-      fcl.proposer(authorization),
-      fcl.payer(authorization),
-      fcl.authorizations([authorization]),
-      fcl.limit(100),
-    ]
-  );
-};
 
 
 const initMainVault = async () => {
