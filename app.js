@@ -19,33 +19,6 @@ const initMainVault = async () => {
   const accountAddress = `0x${user.addr}`
   const contractAddress = accountAddress;
 
-/*
-  const transaction = sdk.transaction`
-
-    // Transaction1.cdc
-
-    import FungibleToken from ${p => p.contractAddress}
-
-    transaction {
-      let account: AuthAccount
-      prepare(acct: AuthAccount) {
-
-        self.account = acct;
-        acct.link<&FungibleToken.Vault{FungibleToken.Receiver, FungibleToken.Balance}>(/public/MainReceiver, target: /storage/MainVault)
-    
-        log("Public Receiver reference created!")
-      }
-    
-      post {
-        getAccount(${p => p.accountAddress}).getCapability(/public/MainReceiver)!
-                        .check<&FungibleToken.Vault{FungibleToken.Receiver}>():
-                        "Vault Receiver Reference was not created correctly"
-        }
-    }
-  `
-  */
-
-
   const transaction = sdk.transaction`${await generateCode(initTransaction, {
     query: /(0x01)/g,
     "0x01": contractAddress
@@ -61,7 +34,7 @@ const initMainVault = async () => {
   ])
 }
 
-
+window.fcl = fcl
 
 let unsubcsribe = null;
 document.getElementById("login").addEventListener('click', ()=>{
@@ -70,7 +43,16 @@ document.getElementById("login").addEventListener('click', ()=>{
         console.log({user});
     })
     console.log(fcl.currentUser())
-    //fcl.authenticate();
+    await fcl.authenticate();
+    updateBalance();
+})
+document.getElementById("logout").addEventListener('click', async ()=>{
+  console.log('Logging out:')
+  console.log(fcl.currentUser())
+  if (typeof unsubscribe === "function") unsubcsribe()
+  
+  await fcl.unauthenticate();
+  updateBalance();
 })
 
 document.getElementById('deploy').addEventListener('click', async ()=>{
@@ -87,12 +69,16 @@ document.getElementById('mint').addEventListener('click', async () => {
   const amount = parseInt(document.getElementById('amount').value)
   const response = await mint(amount)
   console.log(fcl.decode(response))
+  updateBalance()
   
+})
+
+
+const updateBalance = async () => {
   const balanceRes = await getBalance()
   console.log(balanceRes)
-  console.log(fcl.decode(balanceRes))
+  console.log(await fcl.decode(balanceRes))
+  const loggedIn = (await fcl.currentUser().snapshot()).loggedIn 
 
-  document.getElementById('balance').innerHTML = await fcl.decode(balanceRes)
-})
-// simpleComputation();
-
+  document.getElementById('balance').innerHTML = loggedIn ? await fcl.decode(balanceRes) : 'NA'
+}
