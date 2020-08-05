@@ -6,7 +6,7 @@ import * as types from "@onflow/types";
 import fungibleTokenContract from "./cadence/FungibleToken.cdc";
 import initTransaction from "./cadence/transactions/init.cdc";
 
-import { mint, getBalance } from "./flow";
+import { mint, getBalance, initMainVault } from "./flow";
 import { deployContract, generateCode } from "/utils";
 
 
@@ -14,30 +14,10 @@ fcl.config()
   .put("challenge.handshake", "http://localhost:8701/flow/authenticate")
 
 
-const initMainVault = async () => {
-  const user = await fcl.currentUser().snapshot()
-  const accountAddress = `0x${user.addr}`
-  const contractAddress = accountAddress;
-
-  const transaction = sdk.transaction`${await generateCode(initTransaction, {
-    query: /(0x01)/g,
-    "0x01": contractAddress
-  })}`
-  const { authorization } = fcl.currentUser();
-
-  return await fcl.send([
-    transaction,
-    fcl.payer(authorization),
-    fcl.proposer(authorization),
-    fcl.authorizations([authorization]),
-    fcl.limit(100)
-  ])
-}
-
 window.fcl = fcl
 
 let unsubcsribe = null;
-document.getElementById("login").addEventListener('click', ()=>{
+document.getElementById("login").addEventListener('click', async ()=>{
 
     unsubcsribe = fcl.currentUser().subscribe((user)=>{
         console.log({user});

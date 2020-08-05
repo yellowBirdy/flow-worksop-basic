@@ -5,6 +5,6 @@
     "regenerator-runtime": "^0.13.6"
   },
   "scripts": {
-    "dev-wallet": "set PK=3a23373edca570da5c6a7fed74bff0e9fcae16c32e6ab82247c0687d2b2077d1 && fcl-wallet"
+    "dev-wallet": "PK=3a23373edca570da5c6a7fed74bff0e9fcae16c32e6ab82247c0687d2b2077d1 && fcl-wallet"
   }
 }
