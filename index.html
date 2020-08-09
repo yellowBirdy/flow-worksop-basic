@@ -10,9 +10,21 @@
     <button id="deploy">Deploy</button>
     <button id="init">Init</button>
     <button id="mint">Mint</button>
-    <input type="number" name="amount" id="amount" min="1" max="1000" value="100"></input>
+    <form id="mintForm" style="display:inline;">
+        <label> Amount
+            <input type="number" name="amount" id="amount" min="1" max="1000" value="100"></input>
+        </label>
+        <label> Target
+            <select>
+                <option value="0x01cf0e2f2f715450">contract</option>
+                <option value="0x179b6b1cb6755e31">b</option>
+                <option value="0xf3fcd2c1a78f5eee">c</option>
+            </select>
+        </label>
+    </form>
     <br></br>
     <div>Balance: <span id="balance">NA</span></div>
+
     <script src="./app.js"></script>
 </body>
 </html>
